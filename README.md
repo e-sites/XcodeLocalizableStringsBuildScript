@@ -27,9 +27,9 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
             for file in $localizationFiles ; do
                 total="$(cat $file | grep -c "^$word")"
                 if [ "$total" == "0" ] ; then
-                        echo "$file:0: error: Missing translation for $word"
-                        foundMissingTranslation=true
-                    fi
+                    echo "$file:0: error: Missing translation for $word"
+                    foundMissingTranslation=true
+                fi
             done
             wordsDone+=($word)
         fi
