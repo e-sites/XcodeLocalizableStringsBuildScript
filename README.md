@@ -8,8 +8,9 @@ A build phase shell script to show errors for any missing translations used by N
 ![Example](https://raw.github.com/e-sites/XcodeMissingTranslationsErrors/master/Assets/screenshot.png)
 
 ## Code
-```shell
+```
 #!/bin/bash
+
 foundMissingTranslation=false
 wordsDone=()
 localizationFiles=($(find . -name Localizable.strings -type f))
@@ -17,7 +18,7 @@ localizationFiles=($(find . -name Localizable.strings -type f))
 if [ "${#localizationFiles[@]}" -ne 0 ] ; then
     IFS_backup=$IFS
     IFS=$'\r\n\t'
-    lines=($(egrep -rho "NSLocalizedString\(@\"(.+?)\"" ./e-cal/Classes/))
+    lines=($(egrep -rho --include="*.m" --exclude-dir=Pods "NSLocalizedString\(@\"(.+?)\"" .))
     IFS=$IFS_backup
 
     for ((i=0;i<${#lines[*]};i++)); do
@@ -39,3 +40,6 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
     fi
 fi
 ```
+
+## Installation
+Simply copy paste the above code to your `Build Phase` > `Run script` section
