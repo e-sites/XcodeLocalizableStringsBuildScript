@@ -8,7 +8,7 @@ A shell script to show errors for any missing translations used by NSLocalizedSt
 ![Example](https://raw.github.com/e-sites/XcodeMissingTranslationsErrors/master/Assets/screenshot.png)
 
 ## Code
-```
+```Shell
 #!/bin/bash
 
 foundMissingTranslation=false
