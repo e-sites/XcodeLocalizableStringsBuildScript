@@ -1,14 +1,3 @@
-XcodeMissingTranslationsErrors
-==============================
-
-A build phase shell script to show errors for any missing translations used by NSLocalizedString
-
-## Result
-<br>
-![Example](https://raw.github.com/e-sites/XcodeMissingTranslationsErrors/master/Assets/screenshot.png)
-
-## Code
-```shell
 #!/bin/bash
 foundMissingTranslation=false
 wordsDone=()
@@ -38,4 +27,3 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
         exit 1
     fi
 fi
-```
