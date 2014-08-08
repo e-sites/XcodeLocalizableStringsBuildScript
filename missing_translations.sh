@@ -1,4 +1,5 @@
 #!/bin/bash
+
 foundMissingTranslation=false
 wordsDone=()
 localizationFiles=($(find . -name Localizable.strings -type f))
