@@ -11,6 +11,8 @@ A shell script to show errors for any missing translations used by NSLocalizedSt
 ```Shell
 #!/bin/bash
 
+NSLocalizedString="NSLocalizedString"
+
 localizationFiles=($(find . -not -path "./Pods/*" -name Localizable.strings -type f))
 
 if [ "${#localizationFiles[@]}" -ne 0 ] ; then
@@ -20,15 +22,16 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
     
     IFS_backup=$IFS
     IFS=$'\r\n\t'
-    lines=($(egrep -rho --include="*.m" --exclude-dir=Pods "NSLocalizedString\(@\"(.+?)\"" .))
+    lines=($(egrep -rho --include="*.m" --exclude-dir=Pods "${NSLocalizedString}\(@\".+?\"" .))
     IFS=$IFS_backup
 
     for ((i=0;i<${#lines[*]};i++)); do
-        word="$(echo "${lines[$i]}" | sed 's/NSLocalizedString(@//' | sed 's/\")/\"/')" 
+        word="${lines[$i]}"        
+        word=${word:((${#NSLocalizedString} + 2)):((${#word} - NSLocalizedStringLength))}
 
         for ((a=0;a<${#localizationFiles[*]};a++)); do
             file="${localizationFiles[$a]}"
-            wordFile="||${file}:${word}||"
+            wordFile="[${file}:${word}]"
 
             if [[ "${wordsDone[*]}" != *"$wordFile"* ]]; then        
                 total="$(cat $file | grep -c "^$word")"
