@@ -10,16 +10,17 @@ A shell script to show errors for any missing translations used by NSLocalizedSt
 ## Code
 ```Shell
 #!/bin/bash
-
 NSLocalizedString="NSLocalizedString"
 
 localizationFiles=($(find . -not -path "./Pods/*" -name Localizable.strings -type f))
 
+# Does the project contain any Localizable.strings files?
 if [ "${#localizationFiles[@]}" -ne 0 ] ; then
 
     foundMissingTranslation=false
     declare -a wordsDone
     
+    # First search for all the NSLocalizedString() calls in the entire project (only .m files)
     IFS_backup=$IFS
     IFS=$'\r\n\t'
     lines=($(egrep -rho --include="*.m" --exclude-dir=Pods "${NSLocalizedString}\(@\".+?\"" .))
@@ -27,14 +28,20 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
 
     for ((i=0;i<${#lines[*]};i++)); do
         word="${lines[$i]}"        
+
+        # Strip NSLocalizedString(@", so only "<word>" remains
         word=${word:((${#NSLocalizedString} + 2)):((${#word} - NSLocalizedStringLength))}
 
+        # Iterate through the localization files
         for ((a=0;a<${#localizationFiles[*]};a++)); do
             file="${localizationFiles[$a]}"
             wordFile="[${file}:${word}]"
 
+            # If <word> isn't checked yet in <file>
             if [[ "${wordsDone[*]}" != *"$wordFile"* ]]; then        
                 total="$(cat $file | grep -c "^$word")"
+
+                # Find the total occurences of <word> at the beginning of the line in <file>
                 if [ "$total" == "0" ] ; then
                     echo "$file:0: error: Missing translation for $word"
                     foundMissingTranslation=true
@@ -48,8 +55,7 @@ fi
 
 if $foundMissingTranslation; then
     exit 1
-fi
-```
+fi```
 
 ## Installation
 Simply copy paste the above code to your `Build Phase` > `Run script` section
