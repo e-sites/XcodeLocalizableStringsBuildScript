@@ -12,7 +12,7 @@ A shell script to show errors for any missing translations used by NSLocalizedSt
 #!/bin/bash
 NSLocalizedString="NSLocalizedString"
 
-localizationFiles=($(find . -not -path "./Pods/*" -name Localizable.strings -type f))
+localizationFiles=($(find . -not -path "./Pods/*" -not -path "*.bundle*" -name Localizable.strings -type f))
 
 # Does the project contain any Localizable.strings files?
 if [ "${#localizationFiles[@]}" -ne 0 ] ; then
