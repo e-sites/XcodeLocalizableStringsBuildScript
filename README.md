@@ -12,22 +12,20 @@ A shell script to show errors for any missing translations used by NSLocalizedSt
 #!/bin/bash
 NSLocalizedString="NSLocalizedString"
 
+IFS_backup=$IFS
+IFS=$'\r\n\t'
 localizationFiles=($(find . -not -path "./Pods/*" -not -path "*.bundle*" -name Localizable.strings -type f))
 
 # Does the project contain any Localizable.strings files?
 if [ "${#localizationFiles[@]}" -ne 0 ] ; then
-
     foundMissingTranslation=false
     declare -a wordsDone
     
     # First search for all the NSLocalizedString() calls in the entire project (only .m files)
-    IFS_backup=$IFS
-    IFS=$'\r\n\t'
     lines=($(egrep -rho --include="*.m" --exclude-dir=Pods "${NSLocalizedString}\(@\".+?\"" .))
-    IFS=$IFS_backup
 
     for ((i=0;i<${#lines[*]};i++)); do
-        word="${lines[$i]}"        
+        word="${lines[$i]}"    
 
         # Strip NSLocalizedString(@", so only "<word>" remains
         word=${word:((${#NSLocalizedString} + 2)):((${#word} - NSLocalizedStringLength))}
@@ -36,7 +34,6 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
         for ((a=0;a<${#localizationFiles[*]};a++)); do
             file="${localizationFiles[$a]}"
             wordFile="[${file}:${word}]"
-
             # If <word> isn't checked yet in <file>
             if [[ "${wordsDone[*]}" != *"$wordFile"* ]]; then        
                 total="$(cat $file | grep -c "^$word")"
@@ -52,6 +49,7 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
     done
 fi
 
+IFS=$IFS_backup
 
 if $foundMissingTranslation; then
     exit 1
