@@ -53,7 +53,8 @@ IFS=$IFS_backup
 
 if $foundMissingTranslation; then
     exit 1
-fi```
+fi
+```
 
 ## Installation
 Simply copy paste the above code to your `Build Phase` > `Run script` section
