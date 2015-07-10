@@ -1,4 +1,4 @@
-XcodeMissingTranslationsErrors
+XcodeLocalizableStringsBuildScript
 ==============================
 
 A shell script to show errors for any missing translations used by NSLocalizedString at runtime.
