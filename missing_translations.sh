@@ -1,4 +1,3 @@
-#!/bin/bash
 NSLocalizedString="NSLocalizedString"
 
 IFS_backup=$IFS
@@ -41,16 +40,15 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
 
     # Check for duplicate keys
     for ((a=0;a<${#localizationFiles[*]};a++)); do
-        FILENAME="${localizationFiles[$a]}"
-
-        DUPES=`cut -d' ' -f1 "$FILENAME" | sort | uniq -d`
+        filename="${localizationFiles[$a]}"
+        dupes=`cut -d' ' -f1 "$filename" | sort | uniq -d`
 
         while read -r line; do
             if [[ $line == "\""* ]] ;
             then
                 echo "$file:0: warning: $line used multiple times"
             fi
-        done <<< "$DUPES"
+        done <<< "$dupes"
     done
 fi
 IFS=$IFS_backup

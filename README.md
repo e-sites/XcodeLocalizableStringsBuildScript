@@ -14,18 +14,20 @@ NSLocalizedString="NSLocalizedString"
 
 IFS_backup=$IFS
 IFS=$'\r\n\t'
-localizationFiles=($(find . -not -path "./Pods/*" -not -path "*.bundle*" -name Localizable.strings -type f))
+localizationFiles=($(find . -not -path "./Pods/*" -not -path "*.bundle*" -not -path "./.svn/*" -name Localizable.strings -type f))
 
 # Does the project contain any Localizable.strings files?
 if [ "${#localizationFiles[@]}" -ne 0 ] ; then
+
+
     foundMissingTranslation=false
     declare -a wordsDone
-    
+
     # First search for all the NSLocalizedString() calls in the entire project (only .m files)
     lines=($(egrep -rho --include="*.m" --exclude-dir=Pods "${NSLocalizedString}\(@\".+?\"" .))
 
     for ((i=0;i<${#lines[*]};i++)); do
-        word="${lines[$i]}"    
+        word="${lines[$i]}"
 
         # Strip NSLocalizedString(@", so only "<word>" remains
         word=${word:((${#NSLocalizedString} + 2)):((${#word} - NSLocalizedStringLength))}
@@ -35,7 +37,7 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
             file="${localizationFiles[$a]}"
             wordFile="[${file}:${word}]"
             # If <word> isn't checked yet in <file>
-            if [[ "${wordsDone[*]}" != *"$wordFile"* ]]; then        
+            if [[ "${wordsDone[*]}" != *"$wordFile"* ]]; then
                 total="$(cat $file | grep -c "^$word")"
 
                 # Find the total occurences of <word> at the beginning of the line in <file>
@@ -47,8 +49,20 @@ if [ "${#localizationFiles[@]}" -ne 0 ] ; then
             fi
         done
     done
-fi
 
+    # Check for duplicate keys
+    for ((a=0;a<${#localizationFiles[*]};a++)); do
+        filename="${localizationFiles[$a]}"
+        dupes=`cut -d' ' -f1 "$filename" | sort | uniq -d`
+
+        while read -r line; do
+            if [[ $line == "\""* ]] ;
+            then
+                echo "$file:0: warning: $line used multiple times"
+            fi
+        done <<< "$dupes"
+    done
+fi
 IFS=$IFS_backup
 
 if $foundMissingTranslation; then
